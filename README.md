@@ -1,83 +1,207 @@
-# Binance Futures Testnet Trading Bot
+# 🚀 Binance Futures Testnet Trading Bot
 
-A robust, Python-based CLI application for automatically trading on the Binance Futures Testnet natively configured via environment variables.
+A robust, production-style **Python CLI trading bot** for placing orders on the **Binance Futures Testnet (USDT-M)**.
+Designed with clean architecture, input validation, structured logging, and error handling.
 
-## Features
-- **Orders**: Directly interfaces with Market Options, Limit Options, and complex Stop Limit deployments securely.
-- **CLI Framework**: Utilizes interactive prompting and strict UI logging validations built on top of `click`.
-- **Structured Output Logging**: Implements centralized isolated logging schemas with native timestamp, origin map mapping cleanly to terminal streams and active `.log` debugging traces simultaneously. 
+---
 
-## Environment Setup
-Create a `.env` file in the root codebase directly tracking the endpoints:
+## 📌 Overview
+
+This project demonstrates how to build a modular trading bot that interacts with Binance Futures APIs.
+It supports **MARKET** and **LIMIT** orders, includes a clean CLI interface, and logs all operations for traceability.
+
+---
+
+## ✨ Features
+
+* 📈 Place **MARKET** and **LIMIT** orders
+* 🔄 Supports both **BUY** and **SELL** sides
+* 🖥️ Interactive and flag-based **CLI interface (Click)**
+* ✅ Strong **input validation layer**
+* 🧾 Structured **logging (file + console)**
+* ⚠️ Robust **error handling (API + user errors)**
+* 🧱 Clean modular architecture (client, orders, validators, CLI)
+
+---
+
+## 🛠️ Tech Stack
+
+* **Python 3.x**
+* **python-binance**
+* **Click (CLI framework)**
+* **python-dotenv**
+* **Logging (built-in)**
+
+---
+
+## 📂 Project Structure
+
+```
+trading_bot/
+│
+├── bot/
+│   ├── client.py          # Binance client wrapper
+│   ├── orders.py          # Order placement logic
+│   ├── validators.py      # Input validation
+│   ├── logging_config.py  # Logging setup
+│
+├── tests/                 # Unit tests (validators)
+├── cli.py                 # CLI entry point
+├── requirements.txt       # Dependencies
+├── README.md
+├── trading_bot.log        # Generated logs
+```
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/adithyancp123/binance-futures-trading-bot.git
+cd binance-futures-trading-bot
+```
+
+---
+
+### 2. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
 ```env
-API_KEY=your_testnet_api_key
-API_SECRET=your_testnet_api_secret
+API_KEY=your_api_key
+API_SECRET=your_api_secret
 BASE_URL=https://testnet.binancefuture.com
-LOG_LEVEL=INFO
 ```
 
-## Running the CLI
+> ⚠️ Note: Testnet keys are recommended. Do NOT use real funds.
 
-Execute the terminal UI interface directly, prompting for parameters interactively:
+---
+
+## ▶️ Usage
+
+### 🔹 MARKET Order
+
 ```bash
-python cli.py
+python cli.py --symbol BTCUSDT --side BUY --type MARKET --quantity 0.001
 ```
 
-Skip interactivity bypassing confirmation locks by supplying parameters via flags:
+---
+
+### 🔹 LIMIT Order
+
 ```bash
-python cli.py --symbol BTCUSDT --side BUY --type MARKET --quantity 0.05 -y
+python cli.py --symbol BTCUSDT --side SELL --type LIMIT --quantity 0.001 --price 60000
 ```
 
-### Sample CLI Output
+---
 
-**Success Case:**
-```text
+### 🔹 Interactive Confirmation
+
+Before placing an order:
+
+```
+WARNING: You are about to place an order.
+Do you want to proceed? [y/N]:
+```
+
+---
+
+## 📊 Sample Output
+
+```
 ===== ORDER SUMMARY =====
 Symbol:         BTCUSDT
 Side:           BUY
 Type:           MARKET
-Quantity:       0.05
+Quantity:       0.001
 =========================
 
 Executing MARKET BUY order...
 
-===== RESPONSE =====
-SUCCESS: Order placed successfully!
-Order ID:       123456789
-Status:         NEW
-Executed Qty:   0.00
-====================
+❌ Order failed: API-key format invalid
 ```
 
-**Error Case:**
-```text
-FAILURE: Invalid Input - Invalid quantity '-0.5'. Quantity must be a positive number.
+---
+
+## 🧾 Logging
+
+Logs are stored in:
+
+```
+trading_bot.log
 ```
 
-## Error Handling Strategy
-The application employs a defense-in-depth error handling architecture designed to fail gracefully:
-1. **Pre-flight Validation**: All CLI inputs pass through strict, modular evaluators (`validators.py`) preventing malformed requests from ever reaching the exchange.
-2. **Graceful Degradation**: The core service intercepts underlying HTTP bounds mapping `BinanceAPIException` into clean, human-readable CLI alerts. 
-3. **Isolated Tracebacks**: Standard Python traceback stack traces are suppressed from cluttering the command line UI, while remaining faithfully preserved and mapped into the underlying local `trading_bot.log` files for secure backend debugging.
+Includes:
 
-## Future Improvements
-- **Stop-Limit Enhancements**: Extending the current configuration bounds to support algorithmic trailing stops and dynamic triggers.
-- **Web UI Dashboard**: Transitioning the headless CLI configuration into a dynamic, web-based React monitoring console.
-- **Automated Retries**: Establishing asynchronous handler loops to gracefully process momentary Binance API disconnects or ping spikes.
-- **Rate Limit Management**: Implementing weighted queue buckets strictly mapping Binance's operational limits, actively mitigating HTTP `429` blockages before they happen.
+* API requests
+* API responses
+* Error traces
 
-## Running Tests
+Example:
 
-Comprehensive unit tests validate internal bounds handling, restricting erroneous orders blocking silent deployment failures.
-
-The testing pipeline natively runs safely against isolated constraints using `pytest`. 
-
-**1. Install PyTest locally inside your framework:**
-```bash
-pip install pytest
+```
+INFO  | orders | Submitting MARKET request
+ERROR | orders | Binance API Error: API-key format invalid
 ```
 
-**2. Execute the Pytest suite natively over the whole folder array:**
-```bash
-pytest
-```
+---
+
+## 🧠 Error Handling
+
+The application gracefully handles:
+
+* Invalid user inputs
+* Missing parameters
+* Binance API errors
+* Network issues
+
+All errors are:
+
+* Logged in detail (log file)
+* Displayed cleanly to the user (CLI)
+
+---
+
+## ⚠️ Assumptions
+
+* Uses **Binance Futures Testnet (no real funds)**
+* API keys may be restricted (no KYC), resulting in authentication errors
+* Focus is on **correct API integration, structure, and logging**
+
+---
+
+## 🔮 Future Improvements
+
+* Stop-Limit / OCO order support
+* Retry mechanism for API failures
+* Rate limiting handling
+* Web-based UI dashboard
+* Strategy-based trading (signals, indicators)
+
+---
+
+## ✅ Status
+
+✔ Core requirements implemented
+✔ Logging and validation included
+✔ CLI interface working
+✔ Clean modular architecture
+
+---
+
+## 👨‍💻 Author
+
+**Adithyan C P**
+GitHub: https://github.com/adithyancp123
+
+---
